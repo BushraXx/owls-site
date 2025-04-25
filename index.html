@@ -14,6 +14,7 @@
         margin: 0;
         box-sizing: border-box;
       }
+      
       body {
         display: flex;
         justify-content: center;
@@ -23,6 +24,7 @@
         font-family: "Quicksand", sans-serif;
         overflow-x: hidden;
         position: relative;
+        padding: 10px;
       }
       
       .container {
@@ -31,6 +33,11 @@
         max-width: 370px;
         padding: 20px;
         text-align: center;
+        z-index: 1;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 8px 32px rgba(255, 107, 129, 0.1);
       }
       
       .owl-image {
@@ -84,6 +91,15 @@
         text-shadow: 1px 1px 5px rgba(255, 182, 193, 0.8);
       }
       
+      /* For mobile devices, add active state for touch */
+      @media (max-width: 768px) {
+        .btn:active {
+          background-color: #ffa4b1;
+          transform: scale(1.1);
+          box-shadow: 0px 6px 20px rgba(255, 107, 129, 0.7);
+        }
+      }
+      
       .yes-btn {
         left: 30%;
         transform: translateX(-50%);
@@ -114,6 +130,14 @@
         background-color: #ff4757;
         transform: scale(1.05);
         box-shadow: 0px 6px 20px rgba(255, 107, 129, 0.7);
+      }
+      
+      @media (max-width: 768px) {
+        .gift-btn:active {
+          background-color: #ff4757;
+          transform: scale(1.05);
+          box-shadow: 0px 6px 20px rgba(255, 107, 129, 0.7);
+        }
       }
       
       .gift-icon {
@@ -157,6 +181,14 @@
         background-color: #ff4757;
         transform: scale(1.05);
         box-shadow: 0px 6px 20px rgba(255, 107, 129, 0.7);
+      }
+      
+      @media (max-width: 768px) {
+        .submit-btn:active {
+          background-color: #ff4757;
+          transform: scale(1.05);
+          box-shadow: 0px 6px 20px rgba(255, 107, 129, 0.7);
+        }
       }
       
       /* heart loader */
@@ -254,6 +286,55 @@
         font-weight: bold;
         opacity: 0;
         animation: fadeIn 1s ease 1s forwards;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        z-index: 5;
+      }
+      
+      /* Mobile optimizations */
+      @media (max-width: 480px) {
+        .question, .follow-up-question {
+          font-size: 2rem;
+        }
+        
+        .result-text {
+          font-size: 1.8rem;
+        }
+        
+        .owl-image {
+          height: 12rem;
+        }
+        
+        .btn, .submit-btn, .gift-btn {
+          font-size: 16px;
+          padding: 8px 16px;
+        }
+        
+        .the-end {
+          font-size: 1.2rem;
+          bottom: 15px;
+        }
+      }
+      
+      /* Background effect */
+      .background-hearts {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+      }
+      
+      .heart {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        opacity: 0;
+        animation: float 10s linear infinite, pulse 2s ease-in-out infinite;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
       }
       
       /* Animations */
@@ -340,6 +421,32 @@
         }
       }
       
+      @keyframes float {
+        0% {
+          transform: translateY(0) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(-100vh) rotate(360deg);
+          opacity: 0;
+        }
+      }
+      
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      
       @keyframes cssload-square {
         50% {
           border-radius: 100%;
@@ -381,6 +488,9 @@
     <title>Do you miss me?</title>
   </head>
   <body>
+    <!-- Background hearts effect -->
+    <div class="background-hearts" id="background-hearts"></div>
+    
     <!-- First screen: Question -->
     <div id="initial-question" class="container">
       <!-- The owl image you provided -->
@@ -443,6 +553,39 @@
     </div>
 
     <script>
+      // Initialize background hearts
+      function createBackgroundHearts() {
+        const container = document.getElementById('background-hearts');
+        const heartCount = 10;
+        const hearts = ["❤️", "💖", "💕", "💓", "💗"];
+        
+        for (let i = 0; i < heartCount; i++) {
+          const heart = document.createElement('div');
+          heart.className = 'heart';
+          heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+          
+          // Random position
+          const left = Math.random() * 100;
+          const bottom = Math.random() * 100;
+          heart.style.left = `${left}%`;
+          heart.style.bottom = `${bottom}%`;
+          
+          // Random size
+          const size = Math.random() * 15 + 10;
+          heart.style.fontSize = `${size}px`;
+          
+          // Random animation duration
+          const duration = Math.random() * 5 + 7;
+          heart.style.animationDuration = `${duration}s, 2s`;
+          
+          // Random delay
+          const delay = Math.random() * 5;
+          heart.style.animationDelay = `${delay}s, 0s`;
+          
+          container.appendChild(heart);
+        }
+      }
+      
       // Helper function to show loading
       function showLoader() {
         document.getElementById('loader').style.display = 'block';
@@ -469,6 +612,11 @@
         setTimeout(() => {
           hideLoader();
           document.getElementById('follow-up-question').classList.remove('hidden');
+          
+          // Focus on input field for better mobile experience
+          setTimeout(() => {
+            document.getElementById('answer-input').focus();
+          }, 500);
         }, 2000);
       }
       
@@ -489,6 +637,42 @@
         }, 2000);
       }
       
+      // Create kiss emoji rain effect
+      function startKissRain() {
+        const emojis = ["💋", "😘", "❤️", "💕", "💖"];
+        const container = document.body;
+        const isMobile = window.innerWidth <= 768;
+        const emojiCount = isMobile ? 30 : 50; // Less emojis on mobile
+        
+        // Create kiss emojis
+        for (let i = 0; i < emojiCount; i++) {
+          setTimeout(() => {
+            const emoji = document.createElement("div");
+            emoji.className = "kiss-emoji";
+            emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            // Random horizontal position and size
+            const left = Math.random() * 100;
+            const size = Math.random() * (isMobile ? 15 : 20) + (isMobile ? 15 : 20);
+            emoji.style.left = `${left}%`;
+            emoji.style.fontSize = `${size}px`;
+            
+            // Random fall duration between 3-8 seconds
+            const duration = Math.random() * 5 + 3;
+            emoji.style.animationDuration = `${duration}s`;
+            
+            container.appendChild(emoji);
+            
+            // Remove emoji after animation completes
+            setTimeout(() => {
+              if (emoji.parentNode === container) {
+                container.removeChild(emoji);
+              }
+            }, duration * 1000);
+          }, i * (isMobile ? 300 : 200)); // Stagger more on mobile
+        }
+      }
+      
       // Show gift page and start kiss emoji rain
       function showGiftPage() {
         hideAllContainers();
@@ -501,45 +685,11 @@
         }, 2000);
       }
       
-      // Create kiss emoji rain effect
-      function startKissRain() {
-        const emojis = ["💋", "😘", "❤️", "💕", "💖"];
-        const container = document.body;
-        
-        // Create 50 kiss emojis
-        for (let i = 0; i < 50; i++) {
-          setTimeout(() => {
-            const emoji = document.createElement("div");
-            emoji.className = "kiss-emoji";
-            emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-            
-            // Random horizontal position
-            const left = Math.random() * 100;
-            emoji.style.left = `${left}%`;
-            
-            // Random size
-            const size = Math.random() * 20 + 20;
-            emoji.style.fontSize = `${size}px`;
-            
-            // Random fall duration between 3-8 seconds
-            const duration = Math.random() * 5 + 3;
-            emoji.style.animationDuration = `${duration}s`;
-            
-            container.appendChild(emoji);
-            
-            // Remove emoji after animation completes
-            setTimeout(() => {
-              container.removeChild(emoji);
-            }, duration * 1000);
-          }, i * 200); // Stagger the creation of emojis
-        }
-      }
-      
-      // Set up moving Yes button
+      // Set up moving Yes button for both mouse and touch events
       function setupMovingYesButton() {
         const yesBtn = document.getElementById('moving-yes-btn');
         
-        yesBtn.addEventListener('mouseover', () => {
+        const moveButton = () => {
           const maxX = window.innerWidth - yesBtn.offsetWidth;
           const maxY = window.innerHeight - yesBtn.offsetHeight;
           
@@ -549,28 +699,63 @@
           yesBtn.style.position = 'fixed';
           yesBtn.style.left = `${newX}px`;
           yesBtn.style.top = `${newY}px`;
+        };
+        
+        // Mouse events
+        yesBtn.addEventListener('mouseover', moveButton);
+        
+        // Touch events for mobile
+        yesBtn.addEventListener('touchstart', (e) => {
+          e.preventDefault(); // Prevent default touch behavior
+          moveButton();
         });
       }
       
-      // Make the initial No button dodge the cursor
-      document.getElementById('initial-no-btn').addEventListener("mouseover", (e) => {
-        const btn = e.target;
-        const maxX = window.innerWidth - btn.offsetWidth;
-        const maxY = window.innerHeight - btn.offsetHeight;
+      // Make the initial No button dodge for both mouse and touch
+      function setupDodgingNoButton() {
+        const btn = document.getElementById('initial-no-btn');
         
-        const newX = Math.floor(Math.random() * maxX);
-        const newY = Math.floor(Math.random() * maxY);
+        const dodgeButton = () => {
+          const maxX = window.innerWidth - btn.offsetWidth;
+          const maxY = window.innerHeight - btn.offsetHeight;
+          
+          const newX = Math.floor(Math.random() * maxX);
+          const newY = Math.floor(Math.random() * maxY);
+          
+          btn.style.position = 'fixed';
+          btn.style.left = `${newX}px`;
+          btn.style.top = `${newY}px`;
+        };
         
-        btn.style.position = 'fixed';
-        btn.style.left = `${newX}px`;
-        btn.style.top = `${newY}px`;
-      });
+        // Mouse events
+        btn.addEventListener('mouseover', dodgeButton);
+        
+        // Touch events for mobile
+        btn.addEventListener('touchstart', (e) => {
+          e.preventDefault(); // Prevent default touch behavior
+          dodgeButton();
+        });
+      }
       
-      // Add text animation class to all text elements when page loads
+      // Initialize when document is ready
       document.addEventListener('DOMContentLoaded', () => {
+        // Create background hearts
+        createBackgroundHearts();
+        
+        // Set up dodging no button
+        setupDodgingNoButton();
+        
+        // Add text animation class to all text elements
         const textElements = document.querySelectorAll('h2, button');
         textElements.forEach(element => {
           element.style.animation = "textGlow 2s infinite";
+        });
+        
+        // Optimize for mobile: add submit on enter key
+        document.getElementById('answer-input').addEventListener('keyup', (e) => {
+          if (e.key === 'Enter') {
+            checkAnswer();
+          }
         });
       });
     </script>
